@@ -51,12 +51,20 @@ export default function JokesRoute() {
       <main className='jokes-main'>
         <div className='container'>
           <div className='jokes-list'>
-            <Link to='.'>Get a random joke</Link>
+            <p>
+              <Link to='.'>Get a random joke</Link>
+            </p>
+            <p>
+              <Link to='new' className='button'>
+                Add your own
+              </Link>
+            </p>
+            <p>
+              <input type='checkbox' name='' id='' /> Include{' '}
+              <abbr title='Not Safe For Work'>NSFW</abbr>
+            </p>
             <p>Here are a few more jokes to check out:</p>
             <ul>{renderJokesList()}</ul>
-            <Link to='new' className='button'>
-              Add your own
-            </Link>
           </div>
           <div className='jokes-outlet'>
             <Outlet />
