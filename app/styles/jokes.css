@@ -56,9 +56,6 @@
   gap: 1rem;
 }
 
-.jokes-list {
-  max-width: 14rem;
-}
 
 .jokes-outlet {
   flex: 1;
@@ -84,10 +81,16 @@
     padding-top: 3rem;
     padding-bottom: 3rem;
   }
+
+  .jokes-list {
+    max-width: 350px;
+    border-right: 1px solid var(--color-border);
+    padding-right: 1rem;
+  }
 }
 
 @media (max-width: 639px) {
   .jokes-main .container {
-    flex-direction: column;
+    flex-direction: column-reverse;
   }
 }
