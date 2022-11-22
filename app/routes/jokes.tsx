@@ -20,6 +20,10 @@ export default function JokesRoute() {
       <footer>
         <hr />
         <p>J😝kes</p>
+        <p>
+          Not 100% satisfied? Maybe try the infinitely superior{' '}
+          <a href='https://icanhazdadjoke.com/'>icanhazdadjoke.com</a>!
+        </p>
       </footer>
     </>
   )
