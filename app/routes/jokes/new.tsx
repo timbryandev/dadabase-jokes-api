@@ -91,7 +91,7 @@ export default function NewJokeRoute() {
             <input
               type='checkbox'
               name='nsfw'
-              checked={actionData?.fields?.nsfw ? true : undefined}
+              defaultChecked={actionData?.fields?.nsfw ? true : undefined}
             />{' '}
             <abbr title='Not Safe For Work'>NSFW</abbr>
           </label>
