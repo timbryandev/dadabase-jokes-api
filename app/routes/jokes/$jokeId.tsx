@@ -24,7 +24,7 @@ export default function JokeRoute() {
     <div>
       <h2>{data.joke.name}</h2>
       <p>{data.joke.content}</p>
-      <Link to='.'>Permalink</Link>
+      <Link to={'.'}>Permalink for "{data.joke.name}"</Link>
     </div>
   )
 }
