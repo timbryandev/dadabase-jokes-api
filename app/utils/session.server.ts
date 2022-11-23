@@ -1,6 +1,7 @@
 import { db } from './db.server'
 import bcrypt from 'bcryptjs'
 import { createCookieSessionStorage, redirect } from '@remix-run/node'
+import createPasswordHash from './createPasswordHash.server'
 
 type LoginForm = {
   username: string
@@ -31,7 +32,7 @@ export const login = async ({ username, password }: LoginForm) => {
 }
 
 export async function register({ username, password }: LoginForm) {
-  const passwordHash = await bcrypt.hash(password, 10)
+  const passwordHash = await createPasswordHash(password)
 
   const user = await db.user.create({
     data: { username, passwordHash },
