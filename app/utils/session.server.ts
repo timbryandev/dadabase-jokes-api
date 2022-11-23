@@ -93,3 +93,22 @@ export async function logout(request: Request) {
     },
   })
 }
+
+export async function getUser(request: Request) {
+  const userId = await getUserId(request)
+
+  if (typeof userId !== 'string') {
+    return null
+  }
+
+  try {
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { id: true, username: true },
+    })
+
+    return user
+  } catch {
+    throw logout(request)
+  }
+}
