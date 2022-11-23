@@ -70,7 +70,7 @@ export default function JokesRoute() {
       </header>
       <main className='jokes-main'>
         <div className='container'>
-          <div className='jokes-list'>
+          <article className='jokes-list'>
             <p>
               <Link to='.'>Get a random joke</Link>
             </p>
@@ -85,10 +85,10 @@ export default function JokesRoute() {
             </p>
             <p>Here are a few more jokes to check out:</p>
             <ul>{renderJokesList()}</ul>
-          </div>
-          <div className='jokes-outlet'>
+          </article>
+          <article className='jokes-outlet'>
             <Outlet />
-          </div>
+          </article>
         </div>
       </main>
       <footer className='jokes-footer'>
