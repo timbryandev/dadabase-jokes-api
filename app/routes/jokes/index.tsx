@@ -1,6 +1,6 @@
 import type { LoaderFunction } from '@remix-run/node'
 import { json } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
+import { useCatch, useLoaderData } from '@remix-run/react'
 import type { Joke as TJoke, User as TUser } from '@prisma/client'
 import Joke from '~/components/Joke'
 
@@ -16,6 +16,12 @@ export const loader: LoaderFunction = async () => {
     take: 1,
     skip: randomRowNumber,
   })
+
+  if (!randomJoke) {
+    throw new Response('No random joke found', {
+      status: 404,
+    })
+  }
 
   const jokester = await db.user.findUnique({
     where: { id: randomJoke.jokesterId },
@@ -39,6 +45,15 @@ export default function JokesIndexRoute() {
       <Joke {...data.randomJoke} jokester={data.jokester} />
     </>
   )
+}
+
+export function CatchBoundary() {
+  const caught = useCatch()
+
+  if (caught.status === 404) {
+    return <div className='error-container'>There are no jokes to display.</div>
+  }
+  throw new Error(`Unexpected caught response with status: ${caught.status}`)
 }
 
 export function ErrorBoundary() {
