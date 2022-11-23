@@ -9,6 +9,7 @@
     "dev": "remix dev",
     "start": "remix-serve build",
     "prisma:push": "prisma db push",
+    "prisma:reset": "rm prisma/dev.db && npm run prisma:push && prisma db seed && npm run prisma:push",
     "prisma:seed": "prisma db seed"
   },
   "dependencies": {
