@@ -19,7 +19,7 @@ type LoaderData = {
 export const loader: LoaderFunction = async ({ request }) => {
   const jokeListItems = await db.joke.findMany({
     take: 100, // TODO: Need to add some pagination
-    orderBy: { createdAt: 'desc' },
+    orderBy: { name: 'asc' },
     select: { id: true, name: true },
   })
 
