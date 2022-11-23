@@ -1,4 +1,3 @@
-import type { User } from '@prisma/client'
 import { db } from './db.server'
 import bcrypt from 'bcryptjs'
 import { createCookieSessionStorage, redirect } from '@remix-run/node'
@@ -14,7 +13,7 @@ if (!sessionSecret) {
 }
 
 export const login = async ({ username, password }: LoginForm) => {
-  const user: User | null = await db.user.findUnique({
+  const user = await db.user.findUnique({
     where: { username },
   })
 
@@ -83,4 +82,14 @@ export async function requireUserId(
   }
 
   return userId
+}
+
+export async function logout(request: Request) {
+  const session = await getUserSession(request)
+
+  return redirect('/login', {
+    headers: {
+      'Set-Cookie': await storage.destroySession(session),
+    },
+  })
 }
