@@ -30,6 +30,16 @@ export const login = async ({ username, password }: LoginForm) => {
   return { id: user.id, username }
 }
 
+export async function register({ username, password }: LoginForm) {
+  const passwordHash = await bcrypt.hash(password, 10)
+
+  const user = await db.user.create({
+    data: { username, passwordHash },
+  })
+
+  return { id: user.id, username }
+}
+
 const storage = createCookieSessionStorage({
   cookie: {
     name: 'jokes_session',
