@@ -9,7 +9,7 @@
     "dev": "remix dev",
     "start": "remix-serve build",
     "prisma:push": "prisma db push",
-    "prisma:seed": "node --require esbuild-register prisma/seed.ts"
+    "prisma:seed": "prisma db seed"
   },
   "dependencies": {
     "@prisma/client": "^4.6.1",
