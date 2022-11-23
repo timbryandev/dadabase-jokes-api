@@ -1,25 +1,34 @@
 import { PrismaClient } from '@prisma/client'
+import createPasswordHash from '~/utils/createPasswordHash.server'
 const db = new PrismaClient()
 
 async function seed() {
-  const kody = await db.user.create({
-    data: {
-      username: 'kody',
-      // this is a hashed version of "twixrox"
-      passwordHash:
-        '$2b$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNu/1u',
-    },
-  })
+  const adminUser = await createAdminUser()
 
   await Promise.all(
     getJokes().map(joke => {
-      const data = { jokesterId: kody.id, ...joke }
+      const data = { jokesterId: adminUser.id, ...joke }
       return db.joke.create({ data })
     }),
   )
 }
 
 seed()
+
+async function createAdminUser() {
+  const username = process.env.ADMIN_USER || 'admin'
+  const password = process.env.ADMIN_PASS || 'Password1!'
+  const passwordHash = await createPasswordHash(password)
+
+  const admin = await db.user.create({
+    data: {
+      username,
+      passwordHash,
+    },
+  })
+
+  return admin
+}
 
 function getJokes() {
   // shout-out to https://icanhazdadjoke.com/
