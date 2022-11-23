@@ -2,15 +2,16 @@
   "private": true,
   "sideEffects": false,
   "prisma": {
-    "seed": "node --require esbuild-register prisma/seed.ts"
+    "seed": "node --loader ts-node/esm seed.ts"
   },
   "scripts": {
     "build": "remix build",
+    "deploy": "fly deploy --remote-only",
     "dev": "remix dev",
-    "start": "remix-serve build",
     "prisma:push": "prisma db push",
     "prisma:reset": "rm prisma/dev.db && npm run prisma:push && prisma db seed && npm run prisma:push",
-    "prisma:seed": "prisma db seed"
+    "prisma:seed": "prisma db seed",
+    "start": "remix-serve build"
   },
   "dependencies": {
     "@prisma/client": "^4.6.1",
@@ -26,12 +27,14 @@
     "@remix-run/dev": "^1.7.6",
     "@remix-run/eslint-config": "^1.7.6",
     "@types/bcryptjs": "^2.4.2",
+    "@types/node": "^18.11.9",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
     "esbuild-register": "^3.4.1",
     "eslint": "^8.27.0",
     "prisma": "^4.6.1",
-    "typescript": "^4.8.4"
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.3"
   },
   "engines": {
     "node": ">=14"
