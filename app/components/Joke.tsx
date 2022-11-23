@@ -9,7 +9,7 @@ type JokeProps = {
 
 export default function Joke({ content, id, jokester, name }: JokeProps) {
   return (
-    <section>
+    <section className='joke'>
       <header>
         <h2>{name}</h2>
       </header>
