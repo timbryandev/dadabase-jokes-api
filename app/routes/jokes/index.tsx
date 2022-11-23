@@ -40,3 +40,11 @@ export default function JokesIndexRoute() {
     </>
   )
 }
+
+export function ErrorBoundary() {
+  return (
+    <div className='error-container'>
+      Ooops! If you can see me, something went wrong...
+    </div>
+  )
+}

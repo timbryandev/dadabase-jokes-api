@@ -22,13 +22,19 @@ export const links: LinksFunction = () => [
   },
 ]
 
-export default function App() {
+function Document({
+  children,
+  title = `Remix: So great, it's funny!`,
+}: {
+  children: React.ReactNode
+  title?: string
+}) {
   return (
-    <html lang='en-GB'>
+    <html lang='en-Gb'>
       <head>
         <meta charSet='utf-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1' />
-        <meta name='title' content='Remix Jokes API' />
+        <meta name='title' content={title} />
         <meta
           name='description'
           content='Joke API powered by Remix.js following their tutorial series.'
@@ -41,15 +47,32 @@ export default function App() {
         <meta httpEquiv='Content-Type' content='text/html; charset=utf-8' />
         <meta name='language' content='English' />
         <meta name='author' content='TimBryanDev' />
-
-        <title>Remix: So great, it's funny!</title>
-
+        <title>{title}</title>
         <Links />
       </head>
       <body>
-        <Outlet />
+        {children}
         <LiveReload />
       </body>
     </html>
+  )
+}
+
+export default function App() {
+  return (
+    <Document>
+      <Outlet />
+    </Document>
+  )
+}
+// 60
+export function ErrorBoundary({ error }: { error: Error }) {
+  return (
+    <Document title='Uh-oh!'>
+      <div className='error-container'>
+        <h1>App Error</h1>
+        <pre>{error.message}</pre>
+      </div>
+    </Document>
   )
 }
