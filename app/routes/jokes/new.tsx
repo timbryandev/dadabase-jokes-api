@@ -1,6 +1,7 @@
 import type { ActionFunction, LoaderFunction } from '@remix-run/node'
 import { json, redirect } from '@remix-run/node'
 import { Link, useActionData, useCatch } from '@remix-run/react'
+import capitalise from '~/utils/capitalise'
 
 import { db } from '~/utils/db.server'
 
@@ -51,7 +52,11 @@ export const action: ActionFunction = async ({ request }) => {
     content: validateJokeContent(content),
   }
 
-  const fields = { name, content, nsfw: nsfw !== null }
+  const fields = {
+    name: capitalise(name),
+    content: capitalise(content),
+    nsfw: nsfw !== null,
+  }
 
   if (Object.values(fieldErrors).some(Boolean)) {
     return badRequest({ fieldErrors, fields })
@@ -66,7 +71,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request)
-  console.log({ userId })
+
   if (!userId) {
     throw new Response('Unauthorized', { status: 401 })
   }
