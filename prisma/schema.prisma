@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -26,6 +26,8 @@ model Joke {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   name       String
-  content    String
+  content    String   @db.Text
   nsfw       Boolean
+
+  @@unique([name])
 }

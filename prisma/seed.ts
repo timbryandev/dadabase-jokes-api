@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import createPasswordHash from '~/utils/createPasswordHash.server'
+import createPasswordHash from '../app/utils/createPasswordHash.server'
 const db = new PrismaClient()
 
 async function seed() {
@@ -8,7 +8,11 @@ async function seed() {
   await Promise.all(
     getJokes().map(joke => {
       const data = { jokesterId: adminUser.id, ...joke }
-      return db.joke.create({ data })
+      return db.joke.upsert({
+        where: { name: joke.name },
+        update: {},
+        create: data,
+      })
     }),
   )
 }
@@ -20,8 +24,10 @@ async function createAdminUser() {
   const password = process.env.ADMIN_PASS || 'Password1!'
   const passwordHash = await createPasswordHash(password)
 
-  const admin = await db.user.create({
-    data: {
+  const admin = await db.user.upsert({
+    where: { username },
+    update: {},
+    create: {
       username,
       passwordHash,
     },
