@@ -1,46 +1,46 @@
-# Welcome to Remix!
+# Remix Jokes API
 
-- [Remix Docs](https://remix.run/docs)
-
-## Fly Setup
-
-1. [Install `flyctl`](https://fly.io/docs/getting-started/installing-flyctl/)
-
-2. Sign up and log in to Fly
-
-```sh
-flyctl auth signup
-```
-
-3. Setup Fly. It might ask if you want to deploy, say no since you haven't built the app yet.
-
-```sh
-flyctl launch
-```
+Following along to the <https://remix.run/docs/en/v1/tutorials/jokes> tutorial to get to grips with the Remix.js indie stack and deploying my app with a mysql instance through Docker.
 
 ## Development
 
 From your terminal:
 
 ```sh
+cp .env.example .env
+```
+
+This will give you the template .env file that you'll need to fill in with your own values
+
+```sh
+npm install
+```
+
+This installs the Remix.js et all app dependencies.
+
+```sh
 npm run dev
 ```
 
-This starts your app in development mode, rebuilding assets on file changes.
+This starts your app in development mode, rebuilding assets on file changes. It'll also tell you what address and port to access the local build of your app on.
 
-## Deployment
+## Docker local setup / production deployment
 
-If you've followed the setup instructions already, all you need to do is run this:
+I have used Docker to create a local MySQL instance for local development. We use the same docker configuration for production deployments.
 
-```sh
-npm run deploy
-```
+For local development, rather than upping the app and mysqldb, you can just up mysqldb for your local database.
 
-You can run `flyctl info` to get the url and ip address of your server.
+1. `docker-compose build` to build the containers
+2. `docker-compose up -d app mysqldb` to spin up the containers
+3. Access your app via <http://localhost:6868/>
 
-Check out the [fly docs](https://fly.io/docs/getting-started/node/) for more information.
+- On first installation, you may get a DB error when trying to seed. If this occurs, try running our flush script in the container like so:
+  - `docker-compose exec app bash`
+  - `npm run prisma:flush`
 
-## Auth flow
+## Implementation details
+
+### Auth flow
 
 - On the `/login` route.
 - User submits login form.
