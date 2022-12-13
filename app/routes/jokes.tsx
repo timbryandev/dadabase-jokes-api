@@ -1,10 +1,13 @@
 import type { LinksFunction, LoaderFunction } from '@remix-run/node'
 import type { Joke } from '@prisma/client'
+
+import { useCallback, useState } from 'react'
 import { json } from '@remix-run/node'
-import { Link, Outlet, useLoaderData } from '@remix-run/react'
+import { Link, Outlet, Scripts, useLoaderData } from '@remix-run/react'
 
 import { db } from '~/utils/db.server'
 import { getUser } from '~/utils/session.server'
+
 import stylesUrl from '~/styles/jokes.css'
 
 export const links: LinksFunction = () => {
@@ -13,14 +16,18 @@ export const links: LinksFunction = () => {
 
 type LoaderData = {
   user: Awaited<ReturnType<typeof getUser>>
-  jokeListItems: Array<{ id: Joke['id']; name: Joke['name'] }>
+  jokeListItems: Array<{
+    id: Joke['id']
+    name: Joke['name']
+    nsfw: Joke['nsfw']
+  }>
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jokeListItems = await db.joke.findMany({
     take: 100, // TODO: Need to add some pagination
     orderBy: { name: 'asc' },
-    select: { id: true, name: true },
+    select: { id: true, name: true, nsfw: true },
   })
 
   const user = await getUser(request)
@@ -35,14 +42,29 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function JokesRoute() {
   const data = useLoaderData<LoaderData>()
+  const [showNSFW, setShowNSFW] = useState(false)
 
-  function renderJokesList() {
-    return data.jokeListItems.map(joke => (
+  const renderJokesList = useCallback(() => {
+    let jokes = data.jokeListItems
+
+    if (!showNSFW) {
+      jokes = jokes.filter(joke => joke.nsfw === false)
+    }
+
+    return jokes.map(joke => (
       <li key={joke.id}>
+        {joke.nsfw && (
+          <span
+            className='warning warning__nsfw'
+            title='This joke is marked "not safe for work" and may not be appropriate for all audiences - view with caution!'
+          >
+            ⚠️{' '}
+          </span>
+        )}
         <Link to={joke.id}>{joke.name}</Link>
       </li>
     ))
-  }
+  }, [data.jokeListItems, showNSFW])
 
   return (
     <div className='jokes-layout'>
@@ -80,8 +102,17 @@ export default function JokesRoute() {
               </Link>
             </p>
             <p>
-              <input type='checkbox' name='' id='' /> Include{' '}
-              <abbr title='Not Safe For Work'>NSFW</abbr>
+              <input
+                type='checkbox'
+                name='nsfw'
+                id='nsfw'
+                onChange={evt => {
+                  setShowNSFW(evt.target.checked)
+                }}
+              />
+              <label htmlFor='nsfw'>
+                Include <abbr title='Not Safe For Work'>NSFW</abbr>
+              </label>
             </p>
             <p>Here are a few more jokes to check out:</p>
             <ul>{renderJokesList()}</ul>
@@ -102,6 +133,7 @@ export default function JokesRoute() {
           </p>
         </div>
       </footer>
+      <Scripts />
     </div>
   )
 }
