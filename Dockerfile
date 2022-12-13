@@ -11,6 +11,7 @@ RUN mkdir /app
 WORKDIR /app
 
 ADD package.json package-lock.json ./
+
 RUN npm install --production=false
 
 # Setup production node_modules
@@ -56,7 +57,7 @@ ADD . .
 
 ADD prisma .
 RUN npx prisma generate
-RUN npx prisma db seed
+RUN npm run prisma:seed; exit 0
 
 
 ENV PORT 8080
