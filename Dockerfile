@@ -4,8 +4,6 @@ FROM node:16-bullseye-slim as base
 # Install openssl for Prisma
 RUN apt-get update && apt-get install -y openssl
 
-ENV NODE_ENV production
-
 # Install all node_modules, including dev dependencies
 FROM base as deps
 
@@ -17,6 +15,8 @@ RUN npm install --production=false
 
 # Setup production node_modules
 FROM base as production-deps
+
+ENV NODE_ENV production
 
 RUN mkdir /app
 WORKDIR /app
@@ -35,7 +35,6 @@ COPY --from=deps /app/node_modules /app/node_modules
 
 ADD prisma .
 RUN npx prisma generate
-# RUN npx prisma db seed
 
 ADD . .
 RUN npm run build
@@ -52,7 +51,13 @@ COPY --from=production-deps /app/node_modules /app/node_modules
 COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
 COPY --from=build /app/build /app/build
 COPY --from=build /app/public /app/public
+
 ADD . .
+
+ADD prisma .
+RUN npx prisma generate
+RUN npx prisma db seed
+
 
 ENV PORT 8080
 CMD ["npm", "run", "start"]
