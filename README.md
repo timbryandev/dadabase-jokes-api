@@ -1,6 +1,6 @@
 # Remix Jokes API
 
-Following along to the <https://remix.run/docs/en/v1/tutorials/jokes> tutorial to get to grips with the Remix.js indie stack and deploying my app with a mysql instance through Docker.
+Following along to the <https://remix.run/docs/en/v1/tutorials/jokes> tutorial to get to grips with the Remix.js indie stack and deploying my app with a mariadb instance through Docker.
 
 ## Development
 
@@ -26,12 +26,12 @@ This starts your app in development mode, rebuilding assets on file changes. It'
 
 ## Docker local setup / production deployment
 
-I have used Docker to create a local MySQL instance for local development. We use the same docker configuration for production deployments.
+I have used Docker to create a local mariadb instance for local development. We use the same docker configuration for production deployments.
 
-For local development, rather than upping the app and mysqldb, you can just up mysqldb for your local database.
+For local development, rather than upping the app and mariadb, you can just up mariadb for your local database.
 
 1. `docker-compose build` to build the containers
-2. `docker-compose up -d app mysqldb` to spin up the containers
+2. `docker-compose up -d app mariadb` to spin up the containers
 3. Access your app via <http://localhost:6868/>
 
 - On first installation, you may get a DB error when trying to seed. If this occurs, try running our flush script in the container like so:
