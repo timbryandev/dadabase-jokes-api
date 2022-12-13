@@ -15,7 +15,7 @@ export default function Joke({ content, id, jokester, name }: JokeProps) {
       </header>
       <p>{content}</p>
       {typeof jokester === 'string' && <p>Credit: {jokester}</p>}
-      <Link to={id}>Permalink for "{name}"</Link>
+      <Link to={`/jokes/${id}`}>Permalink for "{name}"</Link>
     </section>
   )
 }
