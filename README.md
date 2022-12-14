@@ -40,6 +40,11 @@ For local development, rather than upping the app and mariadb, you can just up m
 
 ## Implementation details
 
+### API endpoints
+
+- `/api/jokes/?showNsfw=<boolean>` will give you the JSON for a random joke. Optional param `showNsfw` will filter jokes accordingly
+- `/api/jokes/:id` will give you the JSON for a specific joke matching the provided ID
+
 ### Auth flow
 
 - On the `/login` route.
