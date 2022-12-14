@@ -1,6 +1,5 @@
 import type { LinksFunction, LoaderFunction } from '@remix-run/node'
 import type { Joke } from '@prisma/client'
-import { useCallback } from 'react'
 import { json } from '@remix-run/node'
 import {
   Link,
@@ -13,7 +12,7 @@ import { db } from '~/utils/db.server'
 import { getUser } from '~/utils/session.server'
 import stylesUrl from '~/styles/jokes.css'
 
-function getNsfwValue(searchParams: URLSearchParams): boolean {
+const getNsfwValue = (searchParams: URLSearchParams): boolean => {
   return searchParams.get('showNsfw') === 'true'
 }
 
@@ -60,10 +59,8 @@ export default function JokesRoute() {
     setSearchParams({ showNsfw } as Record<string, any>)
   }
 
-  const renderJokesList = useCallback(() => {
-    let jokes = [...data.jokeListItems]
-
-    return jokes.map(joke => (
+  const renderJokesList = () => {
+    return data.jokeListItems.map(joke => (
       <li key={joke.id}>
         {joke.nsfw && (
           <span
@@ -76,7 +73,7 @@ export default function JokesRoute() {
         <Link to={joke.id}>{joke.name}</Link>
       </li>
     ))
-  }, [data.jokeListItems])
+  }
 
   return (
     <div className='jokes-layout'>
