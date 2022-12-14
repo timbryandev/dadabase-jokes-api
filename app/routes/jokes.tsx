@@ -13,6 +13,10 @@ import { db } from '~/utils/db.server'
 import { getUser } from '~/utils/session.server'
 import stylesUrl from '~/styles/jokes.css'
 
+function getNsfwValue(searchParams: URLSearchParams): boolean {
+  return searchParams.get('showNsfw') === 'true'
+}
+
 export const links: LinksFunction = () => {
   return [{ rel: 'stylesheet', href: stylesUrl }]
 }
@@ -26,9 +30,9 @@ type LoaderData = {
   }>
 }
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-  // TODO: Hardcoded until we can grab it from the url
-  const showNsfw = true
+export const loader: LoaderFunction = async ({ request }) => {
+  const url = new URL(request.url)
+  const showNsfw = getNsfwValue(url.searchParams)
 
   const jokeListItems = await db.joke.findMany({
     take: 100, // TODO: Need to add some pagination
@@ -50,7 +54,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 export default function JokesRoute() {
   const data = useLoaderData<LoaderData>()
   const [searchParams, setSearchParams] = useSearchParams()
-  const showNsfw = searchParams.get('showNsfw') === 'true'
+  const showNsfw = getNsfwValue(searchParams)
 
   const toggleNsfw = (showNsfw: boolean) => {
     setSearchParams({ showNsfw } as Record<string, any>)
