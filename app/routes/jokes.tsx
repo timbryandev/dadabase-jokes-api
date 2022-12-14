@@ -1,14 +1,20 @@
 import type { LinksFunction, LoaderFunction } from '@remix-run/node'
 import type { Joke } from '@prisma/client'
-
-import { useCallback, useState } from 'react'
 import { json } from '@remix-run/node'
-import { Link, Outlet, Scripts, useLoaderData } from '@remix-run/react'
-
+import {
+  Link,
+  Outlet,
+  Scripts,
+  useLoaderData,
+  useSearchParams,
+} from '@remix-run/react'
 import { db } from '~/utils/db.server'
 import { getUser } from '~/utils/session.server'
-
 import stylesUrl from '~/styles/jokes.css'
+
+const getNsfwValue = (searchParams: URLSearchParams): boolean => {
+  return searchParams.get('showNsfw') === 'true'
+}
 
 export const links: LinksFunction = () => {
   return [{ rel: 'stylesheet', href: stylesUrl }]
@@ -24,10 +30,14 @@ type LoaderData = {
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
+  const url = new URL(request.url)
+  const showNsfw = getNsfwValue(url.searchParams)
+
   const jokeListItems = await db.joke.findMany({
     take: 100, // TODO: Need to add some pagination
     orderBy: { name: 'asc' },
     select: { id: true, name: true, nsfw: true },
+    where: showNsfw ? {} : { nsfw: false },
   })
 
   const user = await getUser(request)
@@ -42,16 +52,15 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function JokesRoute() {
   const data = useLoaderData<LoaderData>()
-  const [showNSFW, setShowNSFW] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const showNsfw = getNsfwValue(searchParams)
 
-  const renderJokesList = useCallback(() => {
-    let jokes = data.jokeListItems
+  const toggleNsfw = (showNsfw: boolean) => {
+    setSearchParams({ showNsfw } as Record<string, any>)
+  }
 
-    if (!showNSFW) {
-      jokes = jokes.filter(joke => joke.nsfw === false)
-    }
-
-    return jokes.map(joke => (
+  const renderJokesList = () => {
+    return data.jokeListItems.map(joke => (
       <li key={joke.id}>
         {joke.nsfw && (
           <span
@@ -64,7 +73,7 @@ export default function JokesRoute() {
         <Link to={joke.id}>{joke.name}</Link>
       </li>
     ))
-  }, [data.jokeListItems, showNSFW])
+  }
 
   return (
     <div className='jokes-layout'>
@@ -106,8 +115,9 @@ export default function JokesRoute() {
                 type='checkbox'
                 name='nsfw'
                 id='nsfw'
+                defaultChecked={showNsfw}
                 onChange={evt => {
-                  setShowNSFW(evt.target.checked)
+                  toggleNsfw(evt.target.checked)
                 }}
               />
               <label htmlFor='nsfw'>
