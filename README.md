@@ -42,8 +42,78 @@ For local development, rather than upping the app and mariadb, you can just up m
 
 ### API endpoints
 
-- `/api/jokes/?showNsfw=<boolean>` will give you the JSON for a random joke. Optional param `showNsfw` will filter jokes accordingly
-- `/api/jokes/:id` will give you the JSON for a specific joke matching the provided ID
+#### `/api/jokes/?showNsfw=<boolean>`
+
+This will give you the JSON for a random joke.
+
+Optional param `showNsfw` will filter jokes accordingly based on whether they contain content that is "safe for work" or not.
+
+An example request to grab a random joke may look like this:
+
+```javascript
+const response = await fetch(
+  'https://jokes.timbryan.dev/api/jokes?showNsfw=true',
+)
+if (response.status === 200) {
+  const data = await response.json()
+  const { content } = data.randomJoke
+  console.log(content)
+}
+```
+
+Where the JSON data being returned may look like:
+
+```json
+{
+  "randomJoke": {
+    "id": "<uuidv4 string>",
+    "jokesterId": "<uuidv4 string>",
+    "createdAt": "<DateTime as ISO string>",
+    "updatedAt": "<DateTime as ISO string>",
+    "name": "Banana",
+    "content": "Why did Billy get fired from the banana factory? He kept throwing away the bent ones.",
+    "nsfw": false
+  },
+  "jokester": "TimBryan"
+}
+```
+
+#### `/api/jokes/:id`
+
+This will give you the JSON for a specific joke matching the provided ID.
+
+Optional param `showNsfw` will filter jokes accordingly based on whether they contain content that is "safe for work" or not.
+
+An example of a request to grab a specific joke may look like this:
+
+```javascript
+const response = await fetch(
+  'https://jokes.timbryan.dev/api/jokes/37df94f6-0ed2-4ea0-8ec6-3834af011e11?showNsfw=true',
+)
+if (response.status === 200) {
+  const data = await response.json()
+  const { content } = data.joke
+  console.log(content)
+}
+```
+
+Where the JSON data being returned may look like:
+
+```json
+{
+  "joke": {
+    "id": "<uuidv4 string>",
+    "jokesterId": "<uuidv4 string>",
+    "createdAt": "<DateTime as ISO string>",
+    "updatedAt": "<DateTime as ISO string>",
+    "name": "Banana",
+    "content": "Why did Billy get fired from the banana factory? He kept throwing away the bent ones.",
+    "nsfw": false
+  },
+  "jokester": "TimBryan",
+  "isJokeOwner": false
+}
+```
 
 ### Auth flow
 
