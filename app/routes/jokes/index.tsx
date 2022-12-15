@@ -5,10 +5,11 @@ import type { Joke as TJoke, User as TUser } from '@prisma/client'
 import Joke from '~/components/Joke'
 
 import { db } from '~/utils/db.server'
+import createApiHeaders from '~/utils/apiHeaders.server'
 
 type LoaderData = { randomJoke: TJoke; jokester?: TUser['username'] }
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
   const count = await db.joke.count()
   const randomRowNumber = Math.floor(Math.random() * count)
 
@@ -33,7 +34,7 @@ export const loader: LoaderFunction = async () => {
     jokester: jokester?.username,
   }
 
-  return json({ ...jokeDate })
+  return json({ ...jokeDate }, { headers: createApiHeaders(request) })
 }
 
 export default function JokesIndexRoute() {

@@ -7,8 +7,13 @@ import Joke from '~/components/Joke'
 
 import { db } from '~/utils/db.server'
 import { requestUserId, requireUserId } from '~/utils/session.server'
+import createApiHeaders from '~/utils/apiHeaders.server'
 
-type LoaderData = { joke: TJoke; jokester?: TUser['username'], isJokeOwner: Boolean }
+type LoaderData = {
+  joke: TJoke
+  jokester?: TUser['username']
+  isJokeOwner: boolean
+}
 
 export const loader: LoaderFunction = async ({ params, request }) => {
   const joke = await db.joke.findUnique({
@@ -33,7 +38,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     jokester: jokester?.username,
     isJokeOwner: userId === joke.jokesterId,
   }
-  return json(data)
+
+  return json(data, { headers: createApiHeaders(request) })
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
