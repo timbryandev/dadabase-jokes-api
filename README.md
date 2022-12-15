@@ -82,13 +82,11 @@ Where the JSON data being returned may look like:
 
 This will give you the JSON for a specific joke matching the provided ID.
 
-Optional param `showNsfw` will filter jokes accordingly based on whether they contain content that is "safe for work" or not.
-
 An example of a request to grab a specific joke may look like this:
 
 ```javascript
 const response = await fetch(
-  'https://jokes.timbryan.dev/api/jokes/37df94f6-0ed2-4ea0-8ec6-3834af011e11?showNsfw=true',
+  'https://jokes.timbryan.dev/api/jokes/37df94f6-0ed2-4ea0-8ec6-3834af011e11',
 )
 if (response.status === 200) {
   const data = await response.json()
