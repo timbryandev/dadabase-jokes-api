@@ -24,7 +24,7 @@ export const links: LinksFunction = () => [
 
 function Document({
   children,
-  title = `Tim Bryan's Jokes API!`,
+  title = `Dad-a-base | TimBryan.dev`,
 }: {
   children: React.ReactNode
   title?: string
@@ -37,7 +37,7 @@ function Document({
         <meta name='title' content={title} />
         <meta
           name='description'
-          content='Joke API powered by Remix.js following their tutorial series.'
+          content='Dad-a-base is a joke API powered by Remix.js following their tutorial series.'
         />
         <meta
           name='keywords'
