@@ -1,4 +1,4 @@
-# Remix Jokes API
+# Dad-a-base Jokes API
 
 Following along to the <https://remix.run/docs/en/v1/tutorials/jokes> tutorial to get to grips with the Remix.js indie stack and deploying my app with a mariadb instance through Docker.
 
