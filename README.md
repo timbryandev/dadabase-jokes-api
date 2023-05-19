@@ -28,17 +28,29 @@ This starts your app in development mode, rebuilding assets on file changes. It'
 
 ## Docker local setup / production deployment
 
-I have used Docker to create a local mariadb instance for local development. We use the same docker configuration for production deployments.
+### For production
 
-For local development, rather than upping the app and mariadb, you can just up mariadb for your local database.
+1. `cp .env.example .env`
+2. Populate `.env` with your values - be sure the environment is set to production, `MYSQL_HOST` is set to your db container name and the `DATABASE_URL` uses the `MYSQL_DOCKER_PORT`
+3. `docker-compose build` to build the containers
+4. `docker-compose up -d` to spin up the containers
+5. Access your app via <http://localhost:6868/> or use a reverse proxy to point your domain at port 6868.
 
-1. `docker-compose build` to build the containers
-2. `docker-compose up -d app mariadb` to spin up the containers
-3. Access your app via <http://localhost:6868/>
-
-- On first installation, you may get a DB error when trying to seed. If this occurs, try running our flush script in the container like so:
+- On first deployment/installation, you may get a DB error when trying to seed. If this occurs, try running our flush script in the container like so:
   - `docker-compose exec app bash`
   - `npm run prisma:flush`
+
+### For local development
+
+1. `cp .env.example .env`
+2. Populate `.env` with your values - be sure the environment is set to production, `MYSQL_HOST` is set to `localhost` and the `DATABASE_URL` uses the `MYSQL_LOCAL_PORT`
+3. `docker-compose build db` to build the database container
+4. `docker-compose up -d db` to spin up the database container
+5. Outside your container, run `npm install`
+6. Outside your container, run `npm run dev`
+7. Access your app via <http://localhost:3001/> - beware that the port sometimes changes to 300x if 3001 is already in use.
+
+* As with production, if you get a DB error during seeding, just run `npm run prisma:flush`
 
 ## Implementation details
 
