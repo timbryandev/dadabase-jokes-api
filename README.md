@@ -4,31 +4,19 @@ Mainly just a place to dump of the awful jokes I've collected over the years and
 
 Following along to the <https://remix.run/docs/en/v1/tutorials/jokes> tutorial to get to grips with the Remix.js indie stack and deploying my app with a mariadb instance through Docker.
 
-## Development
+## Local development
 
-From your terminal:
+1. `cp .env.example .env`
+2. Populate `.env` with your values - be sure the environment is set to something other than `production`, `MYSQL_HOST` is set to `localhost` and the `DATABASE_URL` uses the `MYSQL_LOCAL_PORT`
+3. `docker-compose build db` to build the database container
+4. `docker-compose up -d db` to spin up the database container
+5. Outside your container, run `npm install`
+6. Outside your container, run `npm run dev`
+7. Access your app via <http://localhost:3001/> - beware that the port sometimes changes to 300x if 3001 is already in use.
 
-```sh
-cp .env.example .env
-```
+* On first installation, you may get a DB error when trying to seed. If this occurs, try running our flush script in the container like so: `npm run prisma:flush`
 
-This will give you the template .env file that you'll need to fill in with your own values
-
-```sh
-npm install
-```
-
-This installs the Remix.js et all app dependencies.
-
-```sh
-npm run dev
-```
-
-This starts your app in development mode, rebuilding assets on file changes. It'll also tell you what address and port to access the local build of your app on.
-
-## Docker local setup / production deployment
-
-### For production
+## Production deployment
 
 1. `cp .env.example .env`
 2. Populate `.env` with your values - be sure the environment is set to production, `MYSQL_HOST` is set to your db container name and the `DATABASE_URL` uses the `MYSQL_DOCKER_PORT`
@@ -36,21 +24,9 @@ This starts your app in development mode, rebuilding assets on file changes. It'
 4. `docker-compose up -d` to spin up the containers
 5. Access your app via <http://localhost:6868/> or use a reverse proxy to point your domain at port 6868.
 
-- On first deployment/installation, you may get a DB error when trying to seed. If this occurs, try running our flush script in the container like so:
+- On first deployment, you may get a DB error when trying to seed. If this occurs, try running our flush script in the container like so:
   - `docker-compose exec app bash`
   - `npm run prisma:flush`
-
-### For local development
-
-1. `cp .env.example .env`
-2. Populate `.env` with your values - be sure the environment is set to production, `MYSQL_HOST` is set to `localhost` and the `DATABASE_URL` uses the `MYSQL_LOCAL_PORT`
-3. `docker-compose build db` to build the database container
-4. `docker-compose up -d db` to spin up the database container
-5. Outside your container, run `npm install`
-6. Outside your container, run `npm run dev`
-7. Access your app via <http://localhost:3001/> - beware that the port sometimes changes to 300x if 3001 is already in use.
-
-* As with production, if you get a DB error during seeding, just run `npm run prisma:flush`
 
 ## Implementation details
 
