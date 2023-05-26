@@ -1,19 +1,23 @@
 import type { LoaderFunction } from '@remix-run/node'
 import { json } from '@remix-run/node'
-import { useCatch, useLoaderData } from '@remix-run/react'
+import { useCatch, useLoaderData } from "@remix-run/react";
 import type { Joke as TJoke, User as TUser } from '@prisma/client'
 import Joke from '~/components/Joke'
 
 import { db } from '~/utils/db.server'
 import createApiHeaders from '~/utils/apiHeaders.server'
 
+
 type LoaderData = { randomJoke: TJoke; jokester?: TUser['username'] }
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const count = await db.joke.count()
+export const loader: LoaderFunction = async ({ request, params }) => {
+
+
+  const count = await db.joke.count({where: params.showNsfw ? {} : {nsfw: false}})
   const randomRowNumber = Math.floor(Math.random() * count)
 
   const [randomJoke] = await db.joke.findMany({
+    where: params.showNsfw ? {} : { nsfw: false },
     take: 1,
     skip: randomRowNumber,
   })
