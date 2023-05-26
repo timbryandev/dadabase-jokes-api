@@ -6,15 +6,12 @@ import {
   Outlet,
   Scripts,
   useLoaderData,
+  useParams,
   useSearchParams,
-} from '@remix-run/react'
+} from "@remix-run/react";
 import { db } from '~/utils/db.server'
 import { getUser } from '~/utils/session.server'
 import stylesUrl from '~/styles/jokes.css'
-
-const getNsfwValue = (searchParams: URLSearchParams): boolean => {
-  return searchParams.get('showNsfw') === 'true'
-}
 
 export const links: LinksFunction = () => {
   return [{ rel: 'stylesheet', href: stylesUrl }]
@@ -29,15 +26,13 @@ type LoaderData = {
   }>
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const url = new URL(request.url)
-  const showNsfw = getNsfwValue(url.searchParams)
+export const loader: LoaderFunction = async ({ request, params }) => {
 
   const jokeListItems = await db.joke.findMany({
     take: 100, // TODO: Need to add some pagination
     orderBy: { name: 'asc' },
     select: { id: true, name: true, nsfw: true },
-    where: showNsfw ? {} : { nsfw: false },
+    where: params.showNsfw ? {} : { nsfw: false },
   })
 
   const user = await getUser(request)
@@ -52,8 +47,9 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function JokesRoute() {
   const data = useLoaderData<LoaderData>()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const showNsfw = getNsfwValue(searchParams)
+  const [, setSearchParams] = useSearchParams()
+  const { showNsfw } = useParams();
+  const shouldShowNsfw = showNsfw === "true"
 
   const toggleNsfw = (showNsfw: boolean) => {
     setSearchParams({ showNsfw } as Record<string, any>)
@@ -115,7 +111,7 @@ export default function JokesRoute() {
                 type='checkbox'
                 name='nsfw'
                 id='nsfw'
-                defaultChecked={showNsfw}
+                defaultChecked={shouldShowNsfw}
                 onChange={evt => {
                   toggleNsfw(evt.target.checked)
                 }}
