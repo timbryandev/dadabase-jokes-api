@@ -1,16 +1,27 @@
-import type { LinksFunction, LoaderFunction } from '@remix-run/node'
+import React from 'react'
+import type {
+  ActionFunction,
+  LinksFunction,
+  LoaderFunction,
+} from '@remix-run/node'
 import type { Joke } from '@prisma/client'
 import { json } from '@remix-run/node'
 import {
+  Form,
   Link,
   Outlet,
   Scripts,
+  useActionData,
   useLoaderData,
-  useParams,
-  useSearchParams,
-} from "@remix-run/react";
+  useSubmit,
+  useTransition,
+} from '@remix-run/react'
 import { db } from '~/utils/db.server'
-import { getUser } from '~/utils/session.server'
+import {
+  getNsfwPreference,
+  getUser,
+  setNsfwPreference,
+} from '~/utils/session.server'
 import stylesUrl from '~/styles/jokes.css'
 
 export const links: LinksFunction = () => {
@@ -24,15 +35,18 @@ type LoaderData = {
     name: Joke['name']
     nsfw: Joke['nsfw']
   }>
+  showNsfw: boolean
 }
 
 export const loader: LoaderFunction = async ({ request, params }) => {
+  const sessionNsfw = await getNsfwPreference(request)
+  const showNsfw = sessionNsfw || params.showNsfw === 'true'
 
   const jokeListItems = await db.joke.findMany({
     take: 100, // TODO: Need to add some pagination
     orderBy: { name: 'asc' },
     select: { id: true, name: true, nsfw: true },
-    where: params.showNsfw ? {} : { nsfw: false },
+    where: showNsfw ? {} : { nsfw: false },
   })
 
   const user = await getUser(request)
@@ -40,23 +54,32 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const data: LoaderData = {
     jokeListItems,
     user,
+    showNsfw,
   }
 
   return json(data)
 }
 
+export const action: ActionFunction = async ({ request }) => {
+  const body = await request.formData()
+  const nsfw = body.get('nsfwCheck')
+  const nsfwBool = nsfw === 'true' || nsfw === 'on'
+  return await setNsfwPreference(nsfwBool)
+}
+
 export default function JokesRoute() {
   const data = useLoaderData<LoaderData>()
-  const [, setSearchParams] = useSearchParams()
-  const { showNsfw } = useParams();
-  const shouldShowNsfw = showNsfw === "true"
+  const submit = useSubmit()
+  const transition = useTransition()
+  const actionData = useActionData()
+  const shouldShowNsfw = actionData?.showNsfw || data.showNsfw
 
-  const toggleNsfw = (showNsfw: boolean) => {
-    setSearchParams({ showNsfw } as Record<string, any>)
+  const handleChange = (event: React.ChangeEvent<HTMLFormElement>) => {
+    submit(event.currentTarget, { replace: true })
   }
 
   const renderJokesList = () => {
-    return data.jokeListItems.map(joke => (
+    return data.jokeListItems.map((joke) => (
       <li key={joke.id}>
         {joke.nsfw && (
           <span
@@ -84,11 +107,11 @@ export default function JokesRoute() {
           {data.user ? (
             <div className='user-info'>
               <span>{`Hi ${data.user.username}`}</span>
-              <form action='/logout' method='post'>
+              <Form action='/logout' method='post'>
                 <button type='submit' className='button'>
                   Logout
                 </button>
-              </form>
+              </Form>
             </div>
           ) : (
             <Link to='/login'>Login</Link>
@@ -106,20 +129,21 @@ export default function JokesRoute() {
                 Add your own
               </Link>
             </p>
-            <p>
-              <input
-                type='checkbox'
-                name='nsfw'
-                id='nsfw'
-                defaultChecked={shouldShowNsfw}
-                onChange={evt => {
-                  toggleNsfw(evt.target.checked)
-                }}
-              />
-              <label htmlFor='nsfw'>
-                Include <abbr title='Not Safe For Work'>NSFW</abbr>
-              </label>
-            </p>
+            <Form action='/jokes' method='post' onChange={handleChange}>
+              <p>
+                <input
+                  type='checkbox'
+                  name='nsfwCheck'
+                  id='nsfwCheck'
+                  defaultChecked={shouldShowNsfw}
+                />
+                <label htmlFor='nsfwCheck'>
+                  Include <abbr title='Not Safe For Work'>NSFW</abbr>
+                </label>
+              </p>
+              {transition.state === 'submitting' ? <p>Saving...</p> : null}
+            </Form>
+
             <p>Here are a few more jokes to check out:</p>
             <ul>{renderJokesList()}</ul>
           </article>
