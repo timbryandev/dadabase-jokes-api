@@ -1,23 +1,30 @@
 import type { LoaderFunction } from '@remix-run/node'
 import { json } from '@remix-run/node'
-import { useCatch, useLoaderData } from "@remix-run/react";
+import { useCatch, useLoaderData } from '@remix-run/react'
 import type { Joke as TJoke, User as TUser } from '@prisma/client'
 import Joke from '~/components/Joke'
 
 import { db } from '~/utils/db.server'
 import createApiHeaders from '~/utils/apiHeaders.server'
+import { getNsfwPreference } from '~/utils/session.server'
 
+type LoaderData = {
+  randomJoke: TJoke
+  jokester?: TUser['username']
+  showNsfw: boolean
+}
 
-type LoaderData = { randomJoke: TJoke; jokester?: TUser['username'] }
+export const loader: LoaderFunction = async ({ request }) => {
+  const url = new URL(request.url)
+  const sessionNsfw = await getNsfwPreference(request)
+  const searchNsfw = url.searchParams.get('showNsfw')
+  const showNsfw = sessionNsfw || searchNsfw === 'true'
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-
-
-  const count = await db.joke.count({where: params.showNsfw ? {} : {nsfw: false}})
+  const count = await db.joke.count({ where: showNsfw ? {} : { nsfw: false } })
   const randomRowNumber = Math.floor(Math.random() * count)
 
   const [randomJoke] = await db.joke.findMany({
-    where: params.showNsfw ? {} : { nsfw: false },
+    where: showNsfw ? {} : { nsfw: false },
     take: 1,
     skip: randomRowNumber,
   })
@@ -36,6 +43,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const jokeDate: LoaderData = {
     randomJoke,
     jokester: jokester?.username,
+    showNsfw,
   }
 
   return json({ ...jokeDate }, { headers: createApiHeaders(request) })

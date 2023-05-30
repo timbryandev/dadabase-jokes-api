@@ -1,6 +1,6 @@
 import { db } from './db.server'
 import bcrypt from 'bcryptjs'
-import { createCookieSessionStorage, redirect } from '@remix-run/node'
+import { createCookieSessionStorage, json, redirect } from '@remix-run/node'
 import createPasswordHash from './createPasswordHash.server'
 
 type LoginForm = {
@@ -79,9 +79,7 @@ export async function getUserId(request: Request) {
   return userId
 }
 
-export async function requestUserId(
-  request: Request,
-) {
+export async function requestUserId(request: Request) {
   const session = await getUserSession(request)
   const userId = session.get('userId')
 
@@ -135,4 +133,27 @@ export async function getUser(request: Request) {
   } catch {
     throw logout(request)
   }
+}
+
+export async function setNsfwPreference(nsfw: boolean) {
+  const session = await storage.getSession()
+  session.set('nsfw', nsfw)
+
+  return json(
+    { nsfw },
+    {
+      headers: {
+        'Set-Cookie': await storage.commitSession(session),
+      },
+    },
+  )
+}
+
+export async function getNsfwPreference(request: Request) {
+  const session = await getUserSession(request)
+  const showNsfw = session.get('nsfw')
+
+  if (!showNsfw || typeof showNsfw !== 'boolean') return false
+
+  return showNsfw
 }
