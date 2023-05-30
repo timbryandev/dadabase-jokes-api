@@ -14,9 +14,12 @@ type LoaderData = {
   showNsfw: boolean
 }
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader: LoaderFunction = async ({ request }) => {
+  const url = new URL(request.url)
   const sessionNsfw = await getNsfwPreference(request)
-  const showNsfw = sessionNsfw || params.showNsfw === 'true'
+  const searchNsfw = url.searchParams.get('showNsfw')
+  const showNsfw = sessionNsfw || searchNsfw === 'true'
+
   const count = await db.joke.count({ where: showNsfw ? {} : { nsfw: false } })
   const randomRowNumber = Math.floor(Math.random() * count)
 
