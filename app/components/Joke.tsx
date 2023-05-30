@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from '@remix-run/react'
+import WarningNSFW from '~/components/WarningNSFW'
 
 type JokeProps = {
   content: string
@@ -14,15 +15,7 @@ export default function Joke({ content, id, jokester, name, nsfw }: JokeProps) {
     <section className='joke'>
       <header>
         <h2>
-          {nsfw && (
-            <span
-              className='warning warning__nsfw'
-              title='This joke is marked "not safe for work" and may not be appropriate for all audiences - view with caution!'
-            >
-              ⚠️
-            </span>
-          )}{' '}
-          {name}
+          {nsfw && <WarningNSFW />} {name}
         </h2>
       </header>
       <blockquote className='joke-content'>{content}</blockquote>

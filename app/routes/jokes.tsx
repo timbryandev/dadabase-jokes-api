@@ -23,6 +23,7 @@ import {
   setNsfwPreference,
 } from '~/utils/session.server'
 import stylesUrl from '~/styles/jokes.css'
+import WarningNSFW from '~/components/WarningNSFW'
 
 export const links: LinksFunction = () => {
   return [{ rel: 'stylesheet', href: stylesUrl }]
@@ -38,9 +39,8 @@ type LoaderData = {
   showNsfw: boolean
 }
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-  const sessionNsfw = await getNsfwPreference(request)
-  const showNsfw = sessionNsfw || params.showNsfw === 'true'
+export const loader: LoaderFunction = async ({ request }) => {
+  const showNsfw = await getNsfwPreference(request)
 
   const jokeListItems = await db.joke.findMany({
     take: 100, // TODO: Need to add some pagination
@@ -81,15 +81,7 @@ export default function JokesRoute() {
   const renderJokesList = () => {
     return data.jokeListItems.map((joke) => (
       <li key={joke.id}>
-        {joke.nsfw && (
-          <span
-            className='warning warning__nsfw'
-            title='This joke is marked "not safe for work" and may not be appropriate for all audiences - view with caution!'
-          >
-            ⚠️{' '}
-          </span>
-        )}
-        <Link to={joke.id}>{joke.name}</Link>
+        {joke.nsfw && <WarningNSFW />} <Link to={joke.id}>{joke.name}</Link>
       </li>
     ))
   }
