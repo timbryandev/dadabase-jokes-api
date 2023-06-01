@@ -24,6 +24,7 @@ import {
 } from '~/utils/session.server'
 import stylesUrl from '~/styles/jokes.css'
 import WarningNSFW from '~/components/WarningNSFW'
+import deepClone from '~/utils/deepClone'
 
 export const links: LinksFunction = () => {
   return [{ rel: 'stylesheet', href: stylesUrl }]
@@ -69,14 +70,6 @@ export const action: ActionFunction = async ({ request }) => {
   const nsfwBool = nsfw === 'true' || nsfw === 'on'
   return await setNsfwPreference(nsfwBool)
 }
-
-/**
- * Quick and dirty "deep cloning" using JSON.stringify/parse
- * Don't use on large arrays or objects if possible!
- * @param item
- */
-const deepClone = <T extends any = null>(item: unknown): T =>
-  JSON.parse(JSON.stringify(item))
 
 /**
  * Sort jokes list the three newest jokes at the top of the list
