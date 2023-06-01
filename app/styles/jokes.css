@@ -71,7 +71,7 @@
   position: relative;
 }
 
-.joke-listing li:has(.warning__nsfw) {
+.joke-listing li:has(.warning) {
   list-style: none;
   margin-left: -1.25rem;
 }
