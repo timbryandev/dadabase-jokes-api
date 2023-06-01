@@ -45,7 +45,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     jokester: jokester?.username,
     showNsfw,
   }
-  await new Promise((res) => setTimeout(res, 1000))
+
   return json({ ...jokeDate }, { headers: createApiHeaders(request) })
 }
 
