@@ -24,18 +24,22 @@ import {
 } from '~/utils/session.server'
 import stylesUrl from '~/styles/jokes.css'
 import WarningNSFW from '~/components/WarningNSFW'
+import deepClone from '~/utils/deepClone'
 
 export const links: LinksFunction = () => {
   return [{ rel: 'stylesheet', href: stylesUrl }]
 }
 
+type JokeListItem = {
+  id: Joke['id']
+  name: Joke['name']
+  nsfw: Joke['nsfw']
+  createdAt: Joke['createdAt'] | string
+}
+
 type LoaderData = {
   user: Awaited<ReturnType<typeof getUser>>
-  jokeListItems: Array<{
-    id: Joke['id']
-    name: Joke['name']
-    nsfw: Joke['nsfw']
-  }>
+  jokeListItems: Array<JokeListItem>
   showNsfw: boolean
 }
 
@@ -45,7 +49,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const jokeListItems = await db.joke.findMany({
     take: 100, // TODO: Need to add some pagination
     orderBy: { name: 'asc' },
-    select: { id: true, name: true, nsfw: true },
+    select: { id: true, name: true, nsfw: true, createdAt: true },
     where: showNsfw ? {} : { nsfw: false },
   })
 
@@ -67,19 +71,39 @@ export const action: ActionFunction = async ({ request }) => {
   return await setNsfwPreference(nsfwBool)
 }
 
+/**
+ * Sort jokes list the three newest jokes at the top of the list
+ */
+const sortByNewestThree = (
+  jokeList: Array<JokeListItem>,
+): Array<JokeListItem> => {
+  const clone = deepClone<typeof jokeList>(jokeList)
+  const sortedByDate = [...clone].sort((a, b) => {
+    const d1 = new Date(a.createdAt)
+    const d2 = new Date(b.createdAt)
+    return d2.getTime() - d1.getTime()
+  })
+  const newest = sortedByDate.slice(0, 3)
+  const newestIds = newest.map(({ id }) => id)
+  const rest = clone.filter((original) => !newestIds.includes(original.id))
+  newest.forEach((joke) => (joke.name = `🆕 ${joke.name}`))
+  return newest.concat(rest)
+}
+
 export default function JokesRoute() {
   const data = useLoaderData<LoaderData>()
   const submit = useSubmit()
   const transition = useTransition()
   const actionData = useActionData()
   const shouldShowNsfw = actionData?.showNsfw || data.showNsfw
+  const sortedJokeListItems = sortByNewestThree(data.jokeListItems)
 
   const handleChange = (event: React.ChangeEvent<HTMLFormElement>) => {
     submit(event.currentTarget, { replace: true })
   }
 
   const renderJokesList = () => {
-    return data.jokeListItems.map((joke) => (
+    return sortedJokeListItems.map((joke) => (
       <li key={joke.id}>
         {joke.nsfw && <WarningNSFW />} <Link to={joke.id}>{joke.name}</Link>
       </li>
