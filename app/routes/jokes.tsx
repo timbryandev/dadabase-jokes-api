@@ -161,7 +161,7 @@ export default function JokesRoute() {
             </Form>
 
             <p>Here are a few more jokes to check out:</p>
-            <ul>{renderJokesList()}</ul>
+            <ul className='joke-listing'>{renderJokesList()}</ul>
           </article>
           <article className='jokes-outlet'>
             <Outlet />
