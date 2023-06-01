@@ -45,19 +45,13 @@ export const loader: LoaderFunction = async ({ request }) => {
     jokester: jokester?.username,
     showNsfw,
   }
-
+  await new Promise((res) => setTimeout(res, 1000))
   return json({ ...jokeDate }, { headers: createApiHeaders(request) })
 }
 
 export default function JokesIndexRoute() {
   const data = useLoaderData<LoaderData>()
-
-  return (
-    <>
-      <p>Here's a random joke:</p>
-      <Joke {...data.randomJoke} jokester={data.jokester} />
-    </>
-  )
+  return <Joke {...data.randomJoke} jokester={data.jokester} />
 }
 
 export function CatchBoundary() {
