@@ -109,7 +109,7 @@ export default function JokesRoute() {
       <>
         {newestJokesList.map((joke) => (
           <li key={joke.id}>
-            {joke.nsfw && <WarningNSFW />} <WarningNew />{' '}
+            <WarningNew /> {joke.nsfw && <WarningNSFW />}{' '}
             <Link to={joke.id}>{joke.name}</Link>
           </li>
         ))}{' '}
