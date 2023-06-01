@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link, useTransition } from '@remix-run/react'
 import WarningNSFW from '~/components/WarningNSFW'
 
@@ -12,6 +12,12 @@ type JokeProps = {
 
 export default function Joke({ content, id, jokester, name, nsfw }: JokeProps) {
   const { state } = useTransition()
+
+  useEffect(() => {
+    if (state === 'loading') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [state])
 
   return (
     <section className='joke'>
