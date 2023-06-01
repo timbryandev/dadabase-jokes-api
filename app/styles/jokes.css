@@ -68,6 +68,7 @@
 
 .joke {
   margin-bottom: 2rem;
+  position: relative;
 }
 
 .joke-content {
