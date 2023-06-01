@@ -1,14 +1,18 @@
 import type { ActionFunction, LoaderFunction } from '@remix-run/node'
 import type { Joke as TJoke, User as TUser } from '@prisma/client'
 import { json, redirect } from '@remix-run/node'
-import {useCatch, useLoaderData, useLocation, useParams} from "@remix-run/react";
+import {
+  useCatch,
+  useLoaderData,
+  useLocation,
+  useParams,
+} from '@remix-run/react'
 
 import Joke from '~/components/Joke'
 
 import { db } from '~/utils/db.server'
 import { requestUserId, requireUserId } from '~/utils/session.server'
 import createApiHeaders from '~/utils/apiHeaders.server'
-import {useEffect} from "react";
 
 type LoaderData = {
   joke: TJoke
@@ -78,10 +82,6 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function JokeRoute() {
   const { pathname } = useLocation()
   const data = useLoaderData<LoaderData>()
-
-  useEffect(()=>{
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [pathname])
 
   return (
     <>

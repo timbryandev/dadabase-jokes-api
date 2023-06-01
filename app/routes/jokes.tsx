@@ -25,6 +25,7 @@ import {
 import stylesUrl from '~/styles/jokes.css'
 import WarningNSFW from '~/components/WarningNSFW'
 import deepClone from '~/utils/deepClone'
+import WarningNew from '~/components/WarningNew'
 
 export const links: LinksFunction = () => {
   return [{ rel: 'stylesheet', href: stylesUrl }]
@@ -76,7 +77,7 @@ export const action: ActionFunction = async ({ request }) => {
  */
 const sortByNewestThree = (
   jokeList: Array<JokeListItem>,
-): Array<JokeListItem> => {
+): Array<Array<JokeListItem>> => {
   const clone = deepClone<typeof jokeList>(jokeList)
   const sortedByDate = [...clone].sort((a, b) => {
     const d1 = new Date(a.createdAt)
@@ -86,8 +87,7 @@ const sortByNewestThree = (
   const newest = sortedByDate.slice(0, 3)
   const newestIds = newest.map(({ id }) => id)
   const rest = clone.filter((original) => !newestIds.includes(original.id))
-  newest.forEach((joke) => (joke.name = `🆕 ${joke.name}`))
-  return newest.concat(rest)
+  return [newest, rest]
 }
 
 export default function JokesRoute() {
@@ -96,18 +96,30 @@ export default function JokesRoute() {
   const transition = useTransition()
   const actionData = useActionData()
   const shouldShowNsfw = actionData?.showNsfw || data.showNsfw
-  const sortedJokeListItems = sortByNewestThree(data.jokeListItems)
+  const [newestJokesList, remainingJokesList] = sortByNewestThree(
+    data.jokeListItems,
+  )
 
   const handleChange = (event: React.ChangeEvent<HTMLFormElement>) => {
     submit(event.currentTarget, { replace: true })
   }
 
   const renderJokesList = () => {
-    return sortedJokeListItems.map((joke) => (
-      <li key={joke.id}>
-        {joke.nsfw && <WarningNSFW />} <Link to={joke.id}>{joke.name}</Link>
-      </li>
-    ))
+    return (
+      <>
+        {newestJokesList.map((joke) => (
+          <li key={joke.id}>
+            <WarningNew /> {joke.nsfw && <WarningNSFW />}{' '}
+            <Link to={joke.id}>{joke.name}</Link>
+          </li>
+        ))}{' '}
+        {remainingJokesList.map((joke) => (
+          <li key={joke.id}>
+            {joke.nsfw && <WarningNSFW />} <Link to={joke.id}>{joke.name}</Link>
+          </li>
+        ))}
+      </>
+    )
   }
 
   return (
@@ -152,16 +164,16 @@ export default function JokesRoute() {
                   name='nsfwCheck'
                   id='nsfwCheck'
                   defaultChecked={shouldShowNsfw}
+                  disabled={transition.state === 'submitting'}
                 />
                 <label htmlFor='nsfwCheck'>
                   Include <abbr title='Not Safe For Work'>NSFW</abbr>
                 </label>
               </p>
-              {transition.state === 'submitting' ? <p>Saving...</p> : null}
             </Form>
 
             <p>Here are a few more jokes to check out:</p>
-            <ul>{renderJokesList()}</ul>
+            <ul className='joke-listing'>{renderJokesList()}</ul>
           </article>
           <article className='jokes-outlet'>
             <Outlet />

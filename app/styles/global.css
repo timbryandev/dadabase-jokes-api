@@ -5,6 +5,27 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("/fonts/Atkinson_Hyperlegible/AtkinsonHyperlegible-Regular.ttf");
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("/fonts/Atkinson_Hyperlegible/AtkinsonHyperlegible-Bold.ttf");
+  font-weight: bold;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("/fonts/Atkinson_Hyperlegible/AtkinsonHyperlegible-Itallic.ttf");
+  font-style: italic, oblique;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("/fonts/Atkinson_Hyperlegible/AtkinsonHyperlegible-BoldItallic.ttf");
+  font-weight: bold;
+  font-style: italic, oblique;
+}
+
 :root {
   --hs-links: 48 100%;
   --color-foreground: hsl(0, 0%, 100%);
@@ -17,7 +38,7 @@
       rgba(152, 11, 238, 1) 0%,
       rgba(118, 15, 181, 1) 35%,
       rgba(58, 13, 85, 1) 100%);
-  --font-body: -apple-system, "Segoe UI", Helvetica Neue, Helvetica,
+  --font-body: "Atkinson Hyperlegible", -apple-system, "Segoe UI", Helvetica Neue, Helvetica,
     Roboto, Arial, sans-serif, system-ui, "Apple Color Emoji",
     "Segoe UI Emoji";
   --font-display: baloo, var(--font-body);

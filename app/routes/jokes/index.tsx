@@ -51,13 +51,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function JokesIndexRoute() {
   const data = useLoaderData<LoaderData>()
-
-  return (
-    <>
-      <p>Here's a random joke:</p>
-      <Joke {...data.randomJoke} jokester={data.jokester} />
-    </>
-  )
+  return <Joke {...data.randomJoke} jokester={data.jokester} />
 }
 
 export function CatchBoundary() {
