@@ -152,12 +152,12 @@ export default function JokesRoute() {
                   name='nsfwCheck'
                   id='nsfwCheck'
                   defaultChecked={shouldShowNsfw}
+                  disabled={transition.state === 'submitting'}
                 />
                 <label htmlFor='nsfwCheck'>
                   Include <abbr title='Not Safe For Work'>NSFW</abbr>
                 </label>
               </p>
-              {transition.state === 'submitting' ? <p>Saving...</p> : null}
             </Form>
 
             <p>Here are a few more jokes to check out:</p>
