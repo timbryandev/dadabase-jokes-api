@@ -48,7 +48,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const showNsfw = await getNsfwPreference(request)
 
   const jokeListItems = await db.joke.findMany({
-    take: 100, // TODO: Need to add some pagination
+    take: 200, // TODO: Need to add some pagination
     orderBy: { name: 'asc' },
     select: { id: true, name: true, nsfw: true, createdAt: true },
     where: showNsfw ? {} : { nsfw: false },
