@@ -6,7 +6,7 @@
     "seed": "node --loader ts-node/esm prisma/seed.ts"
   },
   "scripts": {
-    "build": "remix build",
+    "build": "npm run prisma:generate && remix build",
     "dev": "NODE_ENV=dev remix dev",
     "prisma:flush": "npm run prisma:push && npm run prisma:reset && npm run prisma:push && prisma db seed && npm run prisma:push",
     "prisma:generate": "prisma generate",
